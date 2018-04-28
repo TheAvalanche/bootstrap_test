@@ -4,6 +4,7 @@ var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var del = require('del');
 var fileinclude = require('gulp-file-include');
+var npmDist = require('gulp-npm-dist');
 
 gulp.task('hello-world', function() {
   console.log("Hello, world!");
@@ -29,9 +30,16 @@ gulp.task('styles', function() {
              .pipe(gulp.dest('dist/styles'))
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', ['vendorScripts'], function() {
   return gulp.src('src/scripts/**/*.js')
           .pipe(gulp.dest('dist/scripts'));
+});
+
+gulp.task('vendorScripts', function() {
+	gulp.src(npmDist({
+		excludes: ['css/**/*']
+	}), {base:'./node_modules'})
+		.pipe(gulp.dest('dist/scripts/vendor'));
 });
 
 gulp.task('clean', function() {
@@ -40,4 +48,4 @@ gulp.task('clean', function() {
 
 gulp.task('default', ['clean'], function() {
   gulp.start('html', 'styles', 'scripts');
-})
+});
